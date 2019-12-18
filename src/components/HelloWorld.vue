@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <p>{{tokens}}</p>
     <h1>{{ msg }}</h1>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
@@ -31,10 +32,29 @@
 </template>
 
 <script>
+import { HttpApi, WsApi } from 'okex-api';
+
+const httpApi = new HttpApi();
+const wsApi = new WsApi();
+
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  beforeMount() {
+    wsApi.socket.onopen = async () => {
+      wsApi.subscribe('futures/depth5:ETH-USD-191227');
+      wsApi.on('futures/depth5', data => this.$data.tokens = data);
+
+      const tokens = await httpApi.futures.getAllTokens();
+      this.$data.tokens = tokens;
+    };
+  },
+  data() {
+    return {
+      tokens: []
+    };
   }
 }
 </script>
