@@ -24,7 +24,7 @@ export default {
           .filter(q => q.instrument_id.startsWith(this.$props.token))
           .map(q => ({
             instrument_id: q.instrument_id,
-            name: q.instrument_id.substr(-6),
+            name: q.instrument_id.replace(this.$props.token + '-USD-', ''),
             ask: 1 * q.asks[0][0],
             bid: 1 * q.bids[0][0]
           }))

@@ -16,19 +16,29 @@ export default {
       if (!state.initialized) {
         state.tokens = await httpApi.futures.getAllTokens();
         state.initialized = true;
-        wsApi.on('futures/depth5', quotations => {
+
+        const process = quotations => {
           quotations.forEach(q => {
             const old = state.quotations.find(v => v.instrument_id === q.instrument_id);
 
             if (old) Object.assign(old, q);
             else state.quotations.push(q);
           });
-        });
+        };
+
+        wsApi.on('futures/depth5', process);
+        wsApi.on('swap/depth5', process);
       }
     },
 
     async subscribe(state, token) {
       while (!state.initialized) await new Promise(resolve => setTimeout(resolve, 500));
+
+      const swap = token + '-USD-SWAP';
+      if (!state.subscribed.has(swap)) {
+        wsApi.subscribe('swap/depth5:' + swap);
+        state.subscribed.add(swap);
+      }
 
       state.tokens.filter(t => t.startsWith(token + '-USD-')).forEach(t => {
         if (!state.subscribed.has(t)) {
