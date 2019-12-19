@@ -14,8 +14,8 @@ export default {
   mutations: {
     async init(state) {
       if (!state.initialized) {
+        wsApi.socket.onopen = () => state.initialized = true;
         state.tokens = await httpApi.futures.getAllTokens();
-        state.initialized = true;
 
         const process = quotations => {
           quotations.forEach(q => {
@@ -32,7 +32,7 @@ export default {
     },
 
     async subscribe(state, token) {
-      while (!state.initialized) await new Promise(resolve => setTimeout(resolve, 500));
+      while (!state.initialized || state.tokens.length === 0) await new Promise(resolve => setTimeout(resolve, 500));
 
       const swap = token + '-USD-SWAP';
       if (!state.subscribed.has(swap)) {
