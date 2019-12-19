@@ -34,7 +34,7 @@
 <script>
 import { HttpApi, WsApi } from 'okex-api';
 
-const httpApi = new HttpApi();
+const httpApi = new HttpApi(null, null, null, { url: 'https://api.i43.io' });
 const wsApi = new WsApi();
 
 export default {
@@ -44,11 +44,13 @@ export default {
   },
   beforeMount() {
     wsApi.socket.onopen = async () => {
-      wsApi.subscribe('futures/depth5:ETH-USD-191227');
-      wsApi.on('futures/depth5', data => this.$data.tokens = data);
-
       const tokens = await httpApi.futures.getAllTokens();
-      this.$data.tokens = tokens;
+      const ethTokens = tokens.filter(t => t.startsWith('ETH-USD-'));
+
+      wsApi.on('futures/depth5', data => this.$data.tokens = data);
+      ethTokens.forEach(t => {
+        wsApi.subscribe('futures/depth5:' + t);
+      });
     };
   },
   data() {
