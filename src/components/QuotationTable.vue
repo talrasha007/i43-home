@@ -9,7 +9,8 @@
 
 <script>
 export default {
-  name: 'QuotationTable'
+  name: 'QuotationTable',
+  props: ['token']
 }
 </script>
 
