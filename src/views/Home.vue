@@ -24,9 +24,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-table {
-  font-family: Monospaced;
-}
-</style>
