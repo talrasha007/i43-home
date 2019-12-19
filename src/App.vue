@@ -25,6 +25,9 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  beforeMount() {
+    this.$store.commit('quotation/init');
+  }
 };
 </script>

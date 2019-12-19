@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="t of tokens" :key="t">
+      <v-col v-for="[t, d] of tokens" :key="t">
         <h4>{{t}}</h4>
-        <quotation-table :token="t" />
+        <quotation-table :token="t" :digits="d" />
       </v-col>
     </v-row>
   </v-container>
@@ -19,8 +19,14 @@ export default {
   },
   data() {
     return {
-      tokens: ['BTC', 'ETH', 'EOS']
+      tokens: [['BTC', 2], ['ETH', 3], ['EOS', 3]]
     };
   }
 }
 </script>
+
+<style scoped lang="scss">
+table {
+  font-family: Monospaced;
+}
+</style>
