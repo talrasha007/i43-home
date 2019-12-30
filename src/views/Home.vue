@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="[t, d] of tokens" :key="t">
+      <v-col cols="12" md="6" lg="4" v-for="[t, d] of tokens" :key="t">
         <h4>{{t}}</h4>
         <quotation-table :token="t" :digits="d" />
       </v-col>
