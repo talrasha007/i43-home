@@ -11,7 +11,7 @@
 
       <v-spacer />
 
-      <v-btn text v-for="[url, name] of links" :key="url" :href="url" :disabled="url === '#' + $route.path">
+      <v-btn text v-for="[url, name] of links" :key="url" :href="url">
         <span class="mr-2">{{name}}</span>
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
