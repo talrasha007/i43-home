@@ -1,14 +1,21 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
-Vue.use(VueRouter)
+import Home from '../views/Home.vue'
+import Hash from '../views/Hash'
+
+Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: Home
+  },
+  {
+    path: '/hash',
+    name: 'Hash',
+    component: Hash
   },
   {
     path: '/about',
@@ -18,10 +25,10 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   }
-]
+];
 
 const router = new VueRouter({
   routes
-})
+});
 
 export default router

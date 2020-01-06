@@ -11,8 +11,8 @@
 
       <v-spacer />
 
-      <v-btn href="#/" text>
-        <span class="mr-2">Home</span>
+      <v-btn text v-for="[url, name] of links" :key="url" :href="url" :disabled="url === '#' + $route.path">
+        <span class="mr-2">{{name}}</span>
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
     </v-app-bar>
@@ -26,6 +26,14 @@
 <script>
 export default {
   name: 'App',
+  data() {
+    return {
+      links: [
+        ['#/', 'Home'],
+        ['#/hash', 'Hash']
+      ]
+    };
+  },
   beforeMount() {
     this.$store.commit('quotation/init');
   }
