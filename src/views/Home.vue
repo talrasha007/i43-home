@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" md="6" lg="4" v-for="[t, d] of tokens" :key="t">
+      <v-col cols="12" md="6" lg="4" v-for="[t, d] of coins" :key="t">
         <h4>{{t}}</h4>
         <quotation-table :token="t" :digits="d" />
       </v-col>
@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import QuotationTable from '@/components/QuotationTable.vue'
 
 export default {
@@ -17,10 +18,8 @@ export default {
   components: {
     QuotationTable
   },
-  data() {
-    return {
-      tokens: [['BTC', 2], ['ETH', 3], ['EOS', 3]]
-    };
+  computed: {
+    ...mapState('okex', ['coins'])
   }
 }
 </script>
