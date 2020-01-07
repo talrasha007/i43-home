@@ -24,8 +24,15 @@ export default {
         });
       };
 
-      wsApi.on('futures/depth5', process);
-      wsApi.on('swap/depth5', process);
+      wsApi.futures.depth.addListener(process);
+      wsApi.swap.depth.addListener(process);
+
+      wsApi.socket.on('open', () => {
+        state.subscribed.forEach(v => {
+          if (v.endsWith('SWAP')) wsApi.swap.depth.subscribe(v);
+          else wsApi.futures.depth.subscribe(v);
+        });
+      });
     },
 
     async subscribe(state, token) {
@@ -33,17 +40,13 @@ export default {
 
       const swap = token + '-USD-SWAP';
       if (!state.subscribed.has(swap)) {
-        const st = 'swap/depth5:' + swap;
-        wsApi.subscribe(st);
-        wsApi.socket.on('open', () => wsApi.subscribe(st));
+        await wsApi.swap.depth.subscribe(swap);
         state.subscribed.add(swap);
       }
 
       state.tokens.filter(t => t.startsWith(token + '-USD-')).forEach(t => {
         if (!state.subscribed.has(t)) {
-          const ft = 'futures/depth5:' + t;
-          wsApi.subscribe(ft);
-          wsApi.socket.on('open', () => wsApi.subscribe(ft));
+          wsApi.futures.depth.subscribe(t);
           state.subscribed.add(t);
         }
       });
