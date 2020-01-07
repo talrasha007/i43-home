@@ -7,14 +7,15 @@ wsApi.socket.setMaxListeners(32);
 export default {
   namespaced: true,
   state: {
+    coins: [['BTC', 2], ['ETH', 3], ['EOS', 3]],
     loggedIn: false,
-    tokens: [],
+    instruments: [],
     subscribed: new Set(),
     quotations: []
   },
   mutations: {
     async init(state) {
-      state.tokens = await httpApi.futures.getAllTokens();
+      state.instruments = await httpApi.futures.getAllTokens();
 
       const process = quotations => {
         quotations.forEach(q => {
@@ -46,7 +47,7 @@ export default {
     },
 
     async subscribe(state, token) {
-      while (state.tokens.length === 0) await new Promise(resolve => setTimeout(resolve, 500));
+      while (state.instruments.length === 0) await new Promise(resolve => setTimeout(resolve, 500));
 
       const swap = token + '-USD-SWAP';
       if (!state.subscribed.has(swap)) {
@@ -54,7 +55,7 @@ export default {
         state.subscribed.add(swap);
       }
 
-      state.tokens.filter(t => t.startsWith(token + '-USD-')).forEach(t => {
+      state.instruments.filter(t => t.startsWith(token + '-USD-')).forEach(t => {
         if (!state.subscribed.has(t)) {
           wsApi.futures.depth.subscribe(t);
           state.subscribed.add(t);

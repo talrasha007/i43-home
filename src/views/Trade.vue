@@ -9,7 +9,7 @@ import OkexApiSettings from "../components/OkexApiSettings";
 
 export default {
   name: 'Trade',
-  components: {OkexApiSettings},
+  components: { OkexApiSettings },
   comments: {
     OkexApiSettings
   }
