@@ -19,7 +19,7 @@ export default {
   name: 'QuotationTable',
   props: ['token', 'digits'],
   computed: {
-    ...mapState('quotation', {
+    ...mapState('okex', {
       quotations: function (state) {
         return state.quotations
           .filter(q => q.instrument_id.startsWith(this.$props.token))
@@ -48,7 +48,7 @@ export default {
     })
   },
   beforeMount() {
-    this.$store.commit('quotation/subscribe', this.$props.token);
+    this.$store.commit('okex/subscribe', this.$props.token);
   }
 }
 </script>

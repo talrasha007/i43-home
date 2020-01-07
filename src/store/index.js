@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex);
 
-import quotation from "./quotation";
+import okex from "./okex";
 
 export default new Vuex.Store({
   state: {
@@ -13,6 +13,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    quotation
+    okex
   }
 })

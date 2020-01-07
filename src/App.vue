@@ -35,7 +35,7 @@ export default {
     };
   },
   beforeMount() {
-    this.$store.commit('quotation/init');
+    this.$store.commit('okex/init');
   }
 };
 </script>
