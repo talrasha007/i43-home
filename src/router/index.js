@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Home from '../views/Home.vue'
+import Trade from "../views/Trade"
 import Hash from '../views/Hash'
 
 Vue.use(VueRouter);
@@ -16,6 +17,11 @@ const routes = [
     path: '/hash',
     name: 'Hash',
     component: Hash
+  },
+  {
+    path: '/trade',
+    name: 'trade',
+    component: Trade
   },
   {
     path: '/about',

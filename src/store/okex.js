@@ -7,6 +7,7 @@ wsApi.socket.setMaxListeners(32);
 export default {
   namespaced: true,
   state: {
+    loggedIn: false,
     tokens: [],
     subscribed: new Set(),
     quotations: []
@@ -27,7 +28,16 @@ export default {
       wsApi.futures.depth.addListener(process);
       wsApi.swap.depth.addListener(process);
 
-      wsApi.socket.on('open', () => {
+      wsApi.socket.on('open', async () => {
+        if (wsApi.apiKey) {
+          try {
+            await wsApi.login();
+            state.loggedIn = true;
+          } catch (e) {
+            state.loggedIn = false;
+          }
+        }
+
         state.subscribed.forEach(v => {
           if (v.endsWith('SWAP')) wsApi.swap.depth.subscribe(v);
           else wsApi.futures.depth.subscribe(v);
