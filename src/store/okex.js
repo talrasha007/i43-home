@@ -48,6 +48,7 @@ function etlSwapPosition(p) {
 export default {
   namespaced: true,
   state: {
+    tradePair: [],
     coins: [['BTC', 2], ['ETH', 3], ['EOS', 3]],
     loggedIn: false,
     instruments: [],
