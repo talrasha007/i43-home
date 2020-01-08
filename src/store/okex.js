@@ -77,6 +77,15 @@ export default {
         });
       });
 
+      wsApi.on('login', async () =>{
+        if (state.loggedIn) {
+          state.subscribed.forEach(v => {
+            if (v.endsWith('SWAP')) wsApi.swap.position.subscribe(v);
+            else wsApi.futures.position.subscribe(v);
+          });
+        }
+      });
+
       state.instruments = await httpApi.futures.getInstruments();
 
       const process = quotations => {
@@ -121,9 +130,9 @@ export default {
         await wsApi.swap.depth.subscribe(swap);
         state.subscribed.add(swap);
 
-        if (state.loggedIn) {
+        if (httpApi.apiKey) {
           state.positions.push(etlSwapPosition(await await httpApi.swap.getPositions(swap)));
-          await wsApi.swap.position.subscribe(swap);
+          if (state.loggedIn) await wsApi.swap.position.subscribe(swap);
         }
       }
 
@@ -132,10 +141,10 @@ export default {
           await wsApi.futures.depth.subscribe(t);
           state.subscribed.add(t);
 
-          if (state.loggedIn) {
+          if (httpApi.apiKey) {
             const res = await httpApi.futures.getPositions(t);
             res.holding.forEach(p => state.positions.push(p));
-            await wsApi.futures.position.subscribe(t);
+            if (state.loggedIn) await wsApi.futures.position.subscribe(t);
           }
         }
       }
