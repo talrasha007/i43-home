@@ -11,9 +11,9 @@
 
       <v-spacer />
 
-      <v-btn text v-for="[url, name] of links" :key="url" :href="url">
+      <v-btn text v-for="[url, name, icon] of links" :key="url" :href="url">
         <span class="mr-2">{{name}}</span>
-        <v-icon>mdi-open-in-new</v-icon>
+        <v-icon>{{icon}}</v-icon>
       </v-btn>
     </v-app-bar>
 
@@ -29,9 +29,9 @@ export default {
   data() {
     return {
       links: [
-        ['#/', 'Home'],
-        ['#/trade', 'Trade'],
-        ['#/hash', 'Hash']
+        ['#/', '', 'mdi-home'],
+        ['#/trade', 'Trade', ''],
+        ['#/hash', 'Hash', '']
       ]
     };
   },
