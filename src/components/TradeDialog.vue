@@ -31,8 +31,8 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"><v-text-field type="number" label="数量" /><td>
-                <td><v-btn class="primary">开仓</v-btn></td>
+                <td colspan="2"><v-text-field v-model="openCont" type="number" label="数量" /><td>
+                <td><v-btn :disabled="executing" @click="open(long, short)" class="primary">开仓</v-btn></td>
               </tr>
             </tfoot>
           </v-simple-table>
@@ -74,8 +74,8 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="3"><v-text-field type="number" label="数量" /><td>
-                <td><v-btn class="primary">平仓</v-btn></td>
+                <td colspan="3"><v-text-field v-model="closeCont" type="number" label="数量" /><td>
+                <td><v-btn :disabled="executing" @click="close(long, short)" class="primary">平仓</v-btn></td>
               </tr>
             </tfoot>
           </v-simple-table>
@@ -87,6 +87,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { httpApi } from '../store/okex'
 
 export default {
   name: 'TradeDialog',
@@ -102,11 +103,38 @@ export default {
     },
     posProfit(long, short) {
       return this.getPosOpenDiff(long, short) + this.getPosCloseDiff(long, short);
+    },
+    async order(idx, type, size) {
+      const { instrument_id } = this.tradePair[idx];
+      if (instrument_id.endsWith('SWAP')) {
+        await httpApi.swap.order(instrument_id, type, 0, size, 1);
+      } else {
+        await httpApi.futures.order(instrument_id, type, 0, size, 1);
+      }
+    },
+    async open(long, short) {
+      this.executing = true;
+      await this.order(long, 1, this.openCont);
+      await this.order(short, 2, this.openCont);
+      this.executing = false;
+    },
+    async close(long, short) {
+      this.executing = true;
+      await this.order(long, 4, this.closeCont);
+      await this.order(short, 3, this.closeCont);
+      this.executing = false;
     }
   },
   filters: {
     price(v) { return v && (v * 1).toFixed(3); },
     percent(v) { return v && (v * 100).toFixed(1) + '%'; }
+  },
+  data() {
+    return {
+      executing: false,
+      openCont: 0,
+      closeCont: 0
+    };
   },
   computed: {
     ...mapState('okex', {

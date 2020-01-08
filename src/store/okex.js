@@ -46,6 +46,8 @@ function etlSwapPosition(p) {
   return etlResult;
 }
 
+export { httpApi, wsApi }
+
 export default {
   namespaced: true,
   state: {
@@ -59,7 +61,23 @@ export default {
   },
   mutations: {
     async init(state) {
-      state.instruments = await httpApi.futures.getAllTokens();
+      wsApi.socket.on('open', async () => {
+        if (wsApi.apiKey) {
+          try {
+            await wsApi.login();
+            state.loggedIn = true;
+          } catch (e) {
+            state.loggedIn = false;
+          }
+        }
+
+        state.subscribed.forEach(v => {
+          if (v.endsWith('SWAP')) wsApi.swap.depth.subscribe(v);
+          else wsApi.futures.depth.subscribe(v);
+        });
+      });
+
+      state.instruments = await httpApi.futures.getInstruments();
 
       const process = quotations => {
         quotations.forEach(q => {
@@ -91,22 +109,6 @@ export default {
             if (old) Object.assign(old, newVal);
             else state.positions.push(newVal);
           }
-        });
-      });
-
-      wsApi.socket.on('open', async () => {
-        if (wsApi.apiKey) {
-          try {
-            await wsApi.login();
-            state.loggedIn = true;
-          } catch (e) {
-            state.loggedIn = false;
-          }
-        }
-
-        state.subscribed.forEach(v => {
-          if (v.endsWith('SWAP')) wsApi.swap.depth.subscribe(v);
-          else wsApi.futures.depth.subscribe(v);
         });
       });
     },
