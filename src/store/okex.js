@@ -1,8 +1,49 @@
+import _ from 'lodash';
 import { HttpApi, WsApi } from 'okex-api';
 
 const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[]'), { url: 'https://api.i43.io' });
 const wsApi = new WsApi(...JSON.parse(localStorage.getItem('okex') || '[]'));
 wsApi.socket.setMaxListeners(32);
+
+const ignoreFields = ['side', 'timestamp', 'maint_margin_ratio'];
+const keyMap = {
+  long: {
+    position: 'long_qty',
+    avail_position: 'long_avail_qty',
+    avg_cost: 'long_avg_cost',
+    margin: 'long_margin',
+    settled_pnl: 'long_settled_pnl',
+    realized_pnl: 'long_pnl',
+    unrealized_pnl: 'long_unrealised_pnl',
+    settlement_price: 'long_settlement_price'
+  },
+  short: {
+    position: 'short_qty',
+    avail_position: 'short_avail_qty',
+    avg_cost: 'short_avg_cost',
+    margin: 'short_margin',
+    settled_pnl: 'short_settled_pnl',
+    realized_pnl: 'short_pnl',
+    unrealized_pnl: 'short_unrealised_pnl',
+    settlement_price: 'short_settlement_price'
+  }
+};
+
+function etlSwapPosition(p) {
+  const { margin_mode, holding } = p;
+  const etlResult = holding
+    .map((v, idx) => _.chain(v)
+      .toPairs()
+      .filter(p => ignoreFields.indexOf(p[0]) < 0)
+      .map(p => (p[0] = keyMap[holding[idx].side][p[0]] || p[0]) && p)
+      .fromPairs()
+      .value()
+    )
+    .reduce((a, b) => ({ ...a, ...b, margin_mode }));
+
+  etlResult.realised_pnl = etlResult.long_pnl * 1 + etlResult.short_pnl * 1 + '';
+  return etlResult;
+}
 
 export default {
   namespaced: true,
@@ -12,8 +53,7 @@ export default {
     instruments: [],
     subscribed: new Set(),
     quotations: [],
-    swapPositions: [],
-    futuresPositions: []
+    positions: []
   },
   mutations: {
     async init(state) {
@@ -57,8 +97,7 @@ export default {
         state.subscribed.add(swap);
 
         if (state.loggedIn) {
-          const res = await httpApi.swap.getPositions(swap);
-          res.holding.forEach(p => state.swapPositions.push(p));
+          state.positions.push(etlSwapPosition(await await httpApi.swap.getPositions(swap)));
           await wsApi.swap.position.subscribe(swap);
         }
       }
@@ -70,7 +109,7 @@ export default {
 
           if (state.loggedIn) {
             const res = await httpApi.futures.getPositions(t);
-            res.holding.forEach(p => state.futuresPositions.push(p));
+            res.holding.forEach(p => state.positions.push(p));
             await wsApi.futures.position.subscribe(t);
           }
         }
