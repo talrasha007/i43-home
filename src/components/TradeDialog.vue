@@ -99,7 +99,13 @@ export default {
   computed: {
     ...mapState('okex', {
       tradePair(state) {
-        return state.tradePair.sort((q1, q2) => q1.name - q2.name);
+        return state.tradePair.map(p => ({
+          ...p,
+          ...state.quotations
+            .filter(v => p.instrument_id === v.instrument_id)
+            .map(q => ({ ask: q.asks[0][0], bid: q.bids[0][0]}))[0],
+          ...state.positions.find(v => p.instrument_id === v.instrument_id)
+        }));
       }
     })
   }
