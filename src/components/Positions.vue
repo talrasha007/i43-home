@@ -27,7 +27,10 @@ export default {
     this.$store.commit('okex/subscribe', this.coin);
   },
   watch: {
-    coin() { window.console.log(arguments); this.$store.commit('okex/subscribe', this.coin); }
+    coin() {
+      this.$store.state.okex.tradePair.splice(0);
+      this.$store.commit('okex/subscribe', this.coin);
+    }
   },
   data() {
     return {
