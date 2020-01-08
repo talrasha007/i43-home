@@ -1,5 +1,6 @@
 <template>
   <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="$store.state.okex.tradePair" :single-select="false" show-select hide-default-footer>
+    <template v-slot:header.data-table-select></template>
     <template v-slot:item.ask="{ item }">
       <span :class="item.askClass">{{item.ask | price(digits)}}</span>
     </template>
