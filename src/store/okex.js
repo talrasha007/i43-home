@@ -41,7 +41,8 @@ function etlSwapPosition(p) {
     )
     .reduce((a, b) => ({ ...a, ...b, margin_mode }));
 
-  etlResult.realised_pnl = etlResult.long_pnl * 1 + etlResult.short_pnl * 1 + '';
+  etlResult.instrument_id = etlResult.instrument_id || p.instrument_id;
+  etlResult.realised_pnl = (etlResult.long_pnl * 1 || 0) + (etlResult.short_pnl * 1 || 0) + '';
   return etlResult;
 }
 
@@ -71,6 +72,27 @@ export default {
 
       wsApi.futures.depth.addListener(process);
       wsApi.swap.depth.addListener(process);
+
+      wsApi.futures.position.addListener(p => {
+        p.forEach(v => {
+          const old = state.positions.find(sp => sp.instrument_id === v.instrument_id);
+
+          if (old) Object.assign(old, v);
+          else state.positions.push(v);
+        });
+      });
+
+      wsApi.swap.position.addListener(p => {
+        p.forEach(v => {
+          if (v.holding.length > 0) {
+            const newVal = etlSwapPosition(v);
+            const old = state.positions.find(sp => sp.instrument_id === newVal.instrument_id);
+
+            if (old) Object.assign(old, newVal);
+            else state.positions.push(newVal);
+          }
+        });
+      });
 
       wsApi.socket.on('open', async () => {
         if (wsApi.apiKey) {

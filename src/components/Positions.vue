@@ -63,13 +63,13 @@ export default {
           text: 'Long',
           align: 'left',
           sortable: false,
-          value: 'long_qty'
+          value: 'long_avail_qty'
         },
         {
           text: 'Short',
           align: 'left',
           sortable: false,
-          value: 'short_qty'
+          value: 'short_avail_qty'
         }
       ]
     }
