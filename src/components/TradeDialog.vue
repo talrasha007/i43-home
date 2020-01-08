@@ -11,7 +11,7 @@
       <v-card-text v-if="tradePair.length === 2">
         <div v-for="[long, short] of [[0, 1], [1,0]]" :key="'open' + long">
           <v-simple-table v-slot:default v-if="tradePair[long].ask < tradePair[short].bid">
-            <thead><tr><th></th><th>价格</th><th>%</th></tr></thead>
+            <thead><tr><th/><th>价格</th><th>%</th></tr></thead>
             <tbody>
               <tr>
                 <td>{{tradePair[long].name}}</td>
@@ -29,6 +29,12 @@
                 <td class="pos">{{(tradePair[short].bid - tradePair[long].ask) / tradePair[long].ask | percent}}</td>
               </tr>
             </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><v-text-field type="number" label="数量" /><td>
+                <td><v-btn class="primary">开仓</v-btn></td>
+              </tr>
+            </tfoot>
           </v-simple-table>
         </div>
 
@@ -36,36 +42,42 @@
           <v-simple-table v-slot:default v-if="canClose(long, short)">
             <thead><tr><th></th><th>价格</th><th>开仓价</th><th>持仓</th><th>%</th></tr></thead>
             <tbody>
-            <tr>
-              <td>{{tradePair[long].name}}</td>
-              <td>{{tradePair[long].ask}}</td>
-              <td>{{tradePair[long].short_avg_cost | price}}</td>
-              <td>{{tradePair[long].short_avail_qty}}</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>{{tradePair[short].name}}</td>
-              <td>{{tradePair[short].bid}}</td>
-              <td>{{tradePair[short].long_avg_cost | price}}</td>
-              <td>{{tradePair[short].long_avail_qty}}</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td :class="{ pos: getPosCloseDiff(long, short) > 0, neg: getPosCloseDiff(long, short) < 0}">
-                {{getPosCloseDiff(long, short) | price}}
-              </td>
-              <td :class="{ pos: getPosOpenDiff(long, short) > 0, neg: getPosOpenDiff(long, short) < 0}">
-                {{getPosOpenDiff(long, short) | price}}
-              </td>
-              <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
-                {{posProfit(long, short) | price}}
-              </td>
-              <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
-                {{posProfit(long, short) / tradePair[long].ask | percent}}
-              </td>
-            </tr>
+              <tr>
+                <td>{{tradePair[long].name}}</td>
+                <td>{{tradePair[long].ask}}</td>
+                <td>{{tradePair[long].short_avg_cost | price}}</td>
+                <td>{{tradePair[long].short_avail_qty}}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>{{tradePair[short].name}}</td>
+                <td>{{tradePair[short].bid}}</td>
+                <td>{{tradePair[short].long_avg_cost | price}}</td>
+                <td>{{tradePair[short].long_avail_qty}}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td :class="{ pos: getPosCloseDiff(long, short) > 0, neg: getPosCloseDiff(long, short) < 0}">
+                  {{getPosCloseDiff(long, short) | price}}
+                </td>
+                <td :class="{ pos: getPosOpenDiff(long, short) > 0, neg: getPosOpenDiff(long, short) < 0}">
+                  {{getPosOpenDiff(long, short) | price}}
+                </td>
+                <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
+                  {{posProfit(long, short) | price}}
+                </td>
+                <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
+                  {{posProfit(long, short) / tradePair[long].ask | percent}}
+                </td>
+              </tr>
             </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3"><v-text-field type="number" label="数量" /><td>
+                <td><v-btn class="primary">平仓</v-btn></td>
+              </tr>
+            </tfoot>
           </v-simple-table>
         </div>
       </v-card-text>
