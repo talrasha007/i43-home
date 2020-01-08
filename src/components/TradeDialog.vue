@@ -16,7 +16,7 @@
               <tr>
                 <td>{{tradePair[long].name}}</td>
                 <td>{{tradePair[long].ask}}</td>
-                <td></td>
+                <td/>
               </tr>
               <tr>
                 <td>{{tradePair[short].name}}</td>
@@ -24,14 +24,14 @@
                 <td class="pos">{{tradePair[short].bid / tradePair[long].ask | percent}}</td>
               </tr>
               <tr>
-                <td></td>
+                <td/>
                 <td class="pos">{{tradePair[short].bid - tradePair[long].ask | price}}</td>
                 <td class="pos">{{(tradePair[short].bid - tradePair[long].ask) / tradePair[long].ask | percent}}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"><v-text-field v-model="openCont" type="number" label="数量" /><td>
+                <td colspan="2"><v-text-field v-model="openCont" type="number" label="数量" /></td>
                 <td><v-btn :disabled="executing" @click="open(long, short)" class="primary">开仓</v-btn></td>
               </tr>
             </tfoot>
@@ -40,24 +40,24 @@
 
         <div v-for="[long, short] of [[0, 1], [1,0]]" :key="'close' + long">
           <v-simple-table v-slot:default v-if="canClose(long, short)">
-            <thead><tr><th></th><th>价格</th><th>开仓价</th><th>持仓</th><th>%</th></tr></thead>
+            <thead><tr><th/><th>价格</th><th>开仓价</th><th>持仓</th><th>%</th></tr></thead>
             <tbody>
               <tr>
                 <td>{{tradePair[long].name}}</td>
                 <td>{{tradePair[long].ask}}</td>
                 <td>{{tradePair[long].short_avg_cost | price}}</td>
                 <td>{{tradePair[long].short_avail_qty}}</td>
-                <td></td>
+                <td/>
               </tr>
               <tr>
                 <td>{{tradePair[short].name}}</td>
                 <td>{{tradePair[short].bid}}</td>
                 <td>{{tradePair[short].long_avg_cost | price}}</td>
                 <td>{{tradePair[short].long_avail_qty}}</td>
-                <td></td>
+                <td/>
               </tr>
               <tr>
-                <td></td>
+                <td/>
                 <td :class="{ pos: getPosCloseDiff(long, short) > 0, neg: getPosCloseDiff(long, short) < 0}">
                   {{getPosCloseDiff(long, short) | price}}
                 </td>
@@ -74,7 +74,7 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="3"><v-text-field v-model="closeCont" type="number" label="数量" /><td>
+                <td colspan="2"><v-text-field v-model="closeCont" type="number" label="数量" /></td>
                 <td><v-btn :disabled="executing" @click="close(long, short)" class="primary">平仓</v-btn></td>
               </tr>
             </tfoot>
