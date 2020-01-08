@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { HttpApi, WsApi } from 'okex-api';
 
-const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[]'), { url: 'https://api.i43.io' });
+const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[null, null, null]'), { url: 'https://api.i43.io' });
 const wsApi = new WsApi(...JSON.parse(localStorage.getItem('okex') || '[]'));
 wsApi.socket.setMaxListeners(32);
 
