@@ -1,5 +1,8 @@
 <template>
-  <v-data-table :headers="headers" :items="positions" :items-per-page="5" hide-default-footer>
+  <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="selected" :single-select="false" show-select hide-default-footer>
+    <template v-slot:top>
+      <v-btn class="primary" :disabled="selected.length !== 2">GO</v-btn>
+    </template>
     <template v-slot:item.ask="{ item }">
       <span :class="item.askClass">{{item.ask | price(digits)}}</span>
     </template>
@@ -30,6 +33,7 @@ export default {
   },
   data() {
     return {
+      selected: [],
       headers: [
         {
           text: '',
