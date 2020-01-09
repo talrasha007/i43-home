@@ -31,7 +31,8 @@ export default {
       links: [
         ['#/', '', 'mdi-home'],
         ['#/trade', 'Trade', ''],
-        ['#/hash', 'Hash', '']
+        ['#/hash', 'Hash', ''],
+        ['#/settings', '', 'mdi-settings']
       ]
     };
   },
