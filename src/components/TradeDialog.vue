@@ -1,5 +1,5 @@
 <template>
-  <v-dialog max-width="500px">
+  <v-dialog max-width="500px" @close="executing = false">
     <template v-slot:activator="{ on }">
       <v-btn :disabled="tradePair.length !== 2" class="primary" v-on="on">交易</v-btn>
     </template>
@@ -116,14 +116,28 @@ export default {
     },
     async open(long, short) {
       this.executing = true;
-      await this.order(long, 1, this.openCont);
-      await this.order(short, 2, this.openCont);
+      try {
+        await Promise.all([
+          this.order(long, 1, this.openCont),
+          this.order(short, 2, this.openCont)
+        ]);
+      } catch (e) {
+        window.alert(e.message || e.toString());
+      }
+
       this.executing = false;
     },
     async close(long, short) {
       this.executing = true;
-      await this.order(long, 4, this.closeCont);
-      await this.order(short, 3, this.closeCont);
+      try {
+        await Promise.all([
+          this.order(long, 4, this.closeCont),
+          this.order(short, 3, this.closeCont)
+        ]);
+      } catch (e) {
+        window.alert(e.message || e.toString());
+      }
+
       this.executing = false;
     }
   },
