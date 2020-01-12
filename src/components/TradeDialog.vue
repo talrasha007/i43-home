@@ -87,7 +87,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { httpApi } from '../store/okex'
+import { wsApi } from '../store/okex'
 
 export default {
   name: 'TradeDialog',
@@ -108,11 +108,7 @@ export default {
       const { instrument_id, ask, bid } = this.tradePair[idx];
       const price = (type === 1 || type === 4) ? ask * 1.01 : bid * 0.99;
 
-      if (instrument_id.endsWith('SWAP')) {
-        await httpApi.swap.order(instrument_id, type, price, size, 0);
-      } else {
-        await httpApi.futures.order(instrument_id, type, price, size, 0);
-      }
+      await wsApi.trade.order(instrument_id, type, price, size, 0, true);
     },
     async open(long, short) {
       this.executing = true;
