@@ -1,50 +1,8 @@
-import _ from 'lodash';
 import { HttpApi, WsApi } from 'okex-api';
 
 const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[null, null, null]'), { url: 'https://api.i43.io' });
-const wsApi = new WsApi(...JSON.parse(localStorage.getItem('okex') || '[]'));
+const wsApi = new WsApi(...JSON.parse(localStorage.getItem('okex') || '[null,null,null]'), { httpApi });
 wsApi.socket.setMaxListeners(32);
-
-const ignoreFields = ['side', 'timestamp', 'maint_margin_ratio'];
-const keyMap = {
-  long: {
-    position: 'long_qty',
-    avail_position: 'long_avail_qty',
-    avg_cost: 'long_avg_cost',
-    margin: 'long_margin',
-    settled_pnl: 'long_settled_pnl',
-    realized_pnl: 'long_pnl',
-    unrealized_pnl: 'long_unrealised_pnl',
-    settlement_price: 'long_settlement_price'
-  },
-  short: {
-    position: 'short_qty',
-    avail_position: 'short_avail_qty',
-    avg_cost: 'short_avg_cost',
-    margin: 'short_margin',
-    settled_pnl: 'short_settled_pnl',
-    realized_pnl: 'short_pnl',
-    unrealized_pnl: 'short_unrealised_pnl',
-    settlement_price: 'short_settlement_price'
-  }
-};
-
-function etlSwapPosition(p) {
-  const { margin_mode, holding } = p;
-  const etlResult = holding
-    .map((v, idx) => _.chain(v)
-      .toPairs()
-      .filter(p => ignoreFields.indexOf(p[0]) < 0)
-      .map(p => (p[0] = keyMap[holding[idx].side][p[0]] || p[0]) && p)
-      .fromPairs()
-      .value()
-    )
-    .reduce((a, b) => ({ ...a, ...b, margin_mode }));
-
-  etlResult.instrument_id = etlResult.instrument_id || p.instrument_id;
-  etlResult.realised_pnl = (etlResult.long_pnl * 1 || 0) + (etlResult.short_pnl * 1 || 0) + '';
-  return etlResult;
-}
 
 export { httpApi, wsApi }
 
@@ -77,14 +35,8 @@ export default {
         });
       });
 
-      wsApi.on('login', async () =>{
-        if (state.loggedIn) {
-          state.subscribed.forEach(v => {
-            if (v.endsWith('SWAP')) wsApi.swap.position.subscribe(v);
-            else wsApi.futures.position.subscribe(v);
-          });
-        }
-      });
+      wsApi.once('login', () => wsApi.trade.load());
+      wsApi.trade.on('position', () => state.positions = wsApi.trade.positions);
 
       state.instruments = await httpApi.futures.getInstruments();
 
@@ -99,27 +51,6 @@ export default {
 
       wsApi.futures.depth.addListener(process);
       wsApi.swap.depth.addListener(process);
-
-      wsApi.futures.position.addListener(p => {
-        p.forEach(v => {
-          const old = state.positions.find(sp => sp.instrument_id === v.instrument_id);
-
-          if (old) Object.assign(old, v);
-          else state.positions.push(v);
-        });
-      });
-
-      wsApi.swap.position.addListener(p => {
-        p.forEach(v => {
-          if (v.holding.length > 0) {
-            const newVal = etlSwapPosition(v);
-            const old = state.positions.find(sp => sp.instrument_id === newVal.instrument_id);
-
-            if (old) Object.assign(old, newVal);
-            else state.positions.push(newVal);
-          }
-        });
-      });
     },
 
     async subscribe(state, token) {
@@ -129,23 +60,12 @@ export default {
       if (!state.subscribed.has(swap)) {
         await wsApi.swap.depth.subscribe(swap);
         state.subscribed.add(swap);
-
-        if (httpApi.apiKey) {
-          state.positions.push(etlSwapPosition(await await httpApi.swap.getPositions(swap)));
-          if (state.loggedIn) await wsApi.swap.position.subscribe(swap);
-        }
       }
 
       for (const t of state.instruments.filter(t => t.startsWith(token + '-USD-'))) {
         if (!state.subscribed.has(t)) {
           await wsApi.futures.depth.subscribe(t);
           state.subscribed.add(t);
-
-          if (httpApi.apiKey) {
-            const res = await httpApi.futures.getPositions(t);
-            res.holding.forEach(p => state.positions.push(p));
-            if (state.loggedIn) await wsApi.futures.position.subscribe(t);
-          }
         }
       }
     }
