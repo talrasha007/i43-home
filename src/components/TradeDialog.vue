@@ -108,7 +108,11 @@ export default {
       const { instrument_id, ask, bid } = this.tradePair[idx];
       const price = (type === 1 || type === 4) ? ask * 1.01 : bid * 0.99;
 
-      await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+      try {
+        await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+      } catch (e) {
+        await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+      }
     },
     async open(long, short) {
       this.executing = true;
