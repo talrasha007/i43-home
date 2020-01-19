@@ -38,6 +38,42 @@
           </v-simple-table>
         </div>
 
+        <div v-for="[long, short] of [[0, 1], [1,0]]" :key="'switch' + long">
+          <v-simple-table v-slot:default v-if="tradePair[long].ask < tradePair[short].bid">
+            <thead><tr><th/><th>价格</th><th>开仓价</th><th>持仓</th></tr></thead>
+            <tbody>
+            <tr>
+              <td>{{tradePair[long].name}}</td>
+              <td>{{tradePair[long].ask}}</td>
+              <td>{{tradePair[long].short_avg_cost | price}}</td>
+              <td>{{tradePair[long].short_avail_qty}}</td>
+            </tr>
+            <tr>
+              <td>{{tradePair[short].name}}</td>
+              <td>{{tradePair[short].bid}}</td>
+              <td>{{tradePair[short].short_avg_cost | price}}</td>
+              <td>{{tradePair[short].short_avail_qty}}</td>
+            </tr>
+            <tr>
+              <td/>
+              <td :class="{ pos: getPosCloseDiff(long, short) > 0, neg: getPosCloseDiff(long, short) < 0}">
+                {{getPosCloseDiff(long, short) | price}}
+              </td>
+              <td />
+              <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
+                {{(tradePair[short].bid - tradePair[long].ask) / tradePair[long].ask | percent}}
+              </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <td colspan="2"><v-text-field v-model="switchCont" type="number" label="数量" /></td>
+              <td><v-btn :disabled="executing" @click="switchPos(long, short)" class="primary">换仓</v-btn></td>
+            </tr>
+            </tfoot>
+          </v-simple-table>
+        </div>
+
         <div v-for="[long, short] of [[0, 1], [1,0]]" :key="'close' + long">
           <v-simple-table v-slot:default v-if="canClose(long, short)">
             <thead><tr><th/><th>价格</th><th>开仓价</th><th>持仓</th><th>%</th></tr></thead>
@@ -139,6 +175,19 @@ export default {
       }
 
       this.executing = false;
+    },
+    async switchPos(long, short) {
+      this.executing = true;
+      try {
+        await Promise.all([
+          this.order(long, 4, this.switchCont),
+          this.order(short, 2, this.switchCont)
+        ]);
+      } catch (e) {
+        window.alert(e.message || e.toString());
+      }
+
+      this.executing = false;
     }
   },
   filters: {
@@ -149,6 +198,7 @@ export default {
     return {
       executing: false,
       openCont: 0,
+      switchCont: 0,
       closeCont: 0
     };
   },
