@@ -1,20 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
+    <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
         <h3>i43</h3>
       </div>
 
-      <v-spacer />
-
-      <v-btn text v-for="[url, name, icon] of links" :key="url" :href="url">
-        <span class="mr-2">{{name}}</span>
-        <v-icon>{{icon}}</v-icon>
-      </v-btn>
+      <v-tabs right background-color="transparent">
+        <v-tab v-for="[url, name, icon] of links" :key="url" :to="url">{{name}}<v-icon>{{icon}}</v-icon></v-tab>
+      </v-tabs>
     </v-app-bar>
 
     <v-content>
@@ -29,10 +22,10 @@ export default {
   data() {
     return {
       links: [
-        ['#/', '', 'mdi-home'],
-        ['#/trade', 'Trade', ''],
-        ['#/hash', 'Hash', ''],
-        ['#/settings', '', 'mdi-settings']
+        ['/', '', 'mdi-home'],
+        ['/trade', 'Trade', ''],
+        ['/hash', 'Hash', ''],
+        ['/settings', '', 'mdi-settings']
       ]
     };
   },
