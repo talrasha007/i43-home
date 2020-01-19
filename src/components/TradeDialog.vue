@@ -145,18 +145,19 @@ export default {
       const price = (type === 1 || type === 4) ? ask * 1.01 : bid * 0.99;
 
       try {
-        await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+        return await wsApi.trade.order(instrument_id, type, price, size, 0, true);
       } catch (e) {
-        await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+        return await wsApi.trade.order(instrument_id, type, price, size, 0, true);
       }
     },
     async open(long, short) {
       this.executing = true;
       try {
-        await Promise.all([
+        const orders = await Promise.all([
           this.order(long, 1, this.openCont),
           this.order(short, 2, this.openCont)
         ]);
+        alert('Finished: ' + (orders[1].data.price_avg - orders[0].data.price_avg).toFixed(3));
       } catch (e) {
         window.alert(e.message || e.toString());
       }
@@ -166,10 +167,11 @@ export default {
     async close(long, short) {
       this.executing = true;
       try {
-        await Promise.all([
+        const orders = await Promise.all([
           this.order(long, 4, this.closeCont),
           this.order(short, 3, this.closeCont)
         ]);
+        alert('Finished: ' + (orders[1].data.price_avg - orders[0].data.price_avg).toFixed(3));
       } catch (e) {
         window.alert(e.message || e.toString());
       }
@@ -179,10 +181,11 @@ export default {
     async switchPos(long, short) {
       this.executing = true;
       try {
-        await Promise.all([
+        const orders = await Promise.all([
           this.order(long, 4, this.switchCont),
           this.order(short, 2, this.switchCont)
         ]);
+        alert('Finished: ' + (orders[1].data.price_avg - orders[0].data.price_avg).toFixed(3));
       } catch (e) {
         window.alert(e.message || e.toString());
       }
