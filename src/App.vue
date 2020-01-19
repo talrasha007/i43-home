@@ -23,8 +23,8 @@ export default {
     return {
       links: [
         ['/', '', 'mdi-home'],
-        ['/trade', 'Trade', ''],
-        ['/hash', 'Hash', ''],
+        ['/trade', '', 'mdi-finance'],
+        ['/hash', '', 'mdi-tools'],
         ['/settings', '', 'mdi-settings']
       ]
     };
