@@ -39,7 +39,7 @@
         </div>
 
         <div v-for="[long, short] of [[0, 1], [1,0]]" :key="'switch' + long">
-          <v-simple-table v-slot:default v-if="tradePair[long].ask < tradePair[short].bid">
+          <v-simple-table v-slot:default v-if="tradePair[long].short_avail_qty > 0 && tradePair[long].ask < tradePair[short].bid">
             <thead><tr><th/><th>价格</th><th>开仓价</th><th>持仓</th></tr></thead>
             <tbody>
             <tr>
