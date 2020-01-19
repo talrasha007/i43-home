@@ -60,7 +60,7 @@
                 {{getPosCloseDiff(long, short) | price}}
               </td>
               <td />
-              <td :class="{ pos: posProfit(long, short) > 0, neg: posProfit(long, short) < 0}">
+              <td class="pos">
                 {{(tradePair[short].bid - tradePair[long].ask) / tradePair[long].ask | percent}}
               </td>
             </tr>
