@@ -1,6 +1,6 @@
 <template>
   <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="$store.state.okex.tradePair" :single-select="false" show-select hide-default-footer>
-    <template v-slot:header.data-table-select></template>
+    <template v-slot:header.data-table-select />
     <template v-slot:item.ask="{ item }">
       <span :class="item.askClass">{{item.ask | price(digits)}}</span>
     </template>
@@ -19,7 +19,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'Positions',
-  props: ['coin', 'digits'],
+  props: ['coin', 'ins', 'digits'],
   filters: {
     price(v, d) { return v && v.toFixed(d); }
   },
@@ -77,7 +77,7 @@ export default {
   computed: {
     ...mapState('okex', {
       positions(state) {
-        const prefix = this.coin + '-USD-';
+        const prefix = `${this.coin}-${this.ins}-`;
         return state.quotations
           .filter(q => q.instrument_id.startsWith(prefix))
           .map(q => ({
