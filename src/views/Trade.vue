@@ -1,16 +1,16 @@
 <template>
   <v-container>
     <v-row align="center">
-      <v-col cols="3">
+      <v-col cols="4">
         <v-select :items="coins" v-model="coin" item-text="0" :item-value="v => v" label="COIN" />
       </v-col>
-      <v-col cols="3">
-        <v-btn-toggle mandatory>
+      <v-col cols="4">
+        <v-btn-toggle mandatory dense>
           <v-btn @click="ins = 'USD'">USD</v-btn>
           <v-btn @click="ins = 'USDT'">USDT</v-btn>
         </v-btn-toggle>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="4">
         <trade-dialog />
       </v-col>
     </v-row>
