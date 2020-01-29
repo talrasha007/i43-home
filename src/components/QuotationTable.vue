@@ -17,15 +17,15 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'QuotationTable',
-  props: ['token', 'digits'],
+  props: ['token', 'ins', 'digits'],
   computed: {
     ...mapState('okex', {
       quotations: function (state) {
         return state.quotations
-          .filter(q => q.instrument_id.startsWith(this.$props.token))
+          .filter(q => q.instrument_id.startsWith(`${this.token}-${this.ins}-`))
           .map(q => ({
             instrument_id: q.instrument_id,
-            name: q.instrument_id.replace(this.$props.token + '-USD-', ''),
+            name: q.instrument_id.replace(`${this.token}-${this.ins}-`, ''),
             ask: 1 * q.asks[0][0],
             bid: 1 * q.bids[0][0]
           }))

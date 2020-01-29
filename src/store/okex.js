@@ -56,16 +56,18 @@ export default {
     async subscribe(state, token) {
       while (state.instruments.length === 0 || (wsApi.apiKey && !state.loggedIn)) await new Promise(resolve => setTimeout(resolve, 500));
 
-      const swap = token + '-USD-SWAP';
-      if (!state.subscribed.has(swap)) {
-        await wsApi.swap.depth.subscribe(swap);
-        state.subscribed.add(swap);
-      }
+      for (const c of ['USD', 'USDT']) {
+        const swap = `${token}-${c}-SWAP`;
+        if (!state.subscribed.has(swap)) {
+          await wsApi.swap.depth.subscribe(swap);
+          state.subscribed.add(swap);
+        }
 
-      for (const t of state.instruments.filter(t => t.startsWith(token + '-USD-'))) {
-        if (!state.subscribed.has(t)) {
-          await wsApi.futures.depth.subscribe(t);
-          state.subscribed.add(t);
+        for (const t of state.instruments.filter(t => t.startsWith(`${token}-${c}-`))) {
+          if (!state.subscribed.has(t)) {
+            await wsApi.futures.depth.subscribe(t);
+            state.subscribed.add(t);
+          }
         }
       }
     }
