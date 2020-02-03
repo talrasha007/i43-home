@@ -7,7 +7,7 @@
       <v-col cols="12" sm="4"><v-text-field label="length" type="number" v-model="length" /></v-col>
     </v-row>
     <v-row align="center">
-      <v-col cols="8" sm="4" ref="result"><v-text-field readonly v-model="result" label="result" /></v-col>
+      <v-col cols="8" sm="4" ref="result"><v-text-field class="result" readonly v-model="result" label="result" /></v-col>
       <v-col cols="4" sm="8"><v-btn @click="copyToClipboard" class="primary" v-if="result">复制</v-btn></v-col>
     </v-row>
   </v-container>
@@ -44,5 +44,7 @@ export default {
 </script>
 
 <style scoped>
-
+.result {
+  font-family: monospace;
+}
 </style>
