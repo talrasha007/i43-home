@@ -147,7 +147,7 @@ export default {
       try {
         return await wsApi.trade.order(instrument_id, type, price, size, 0, true);
       } catch (e) {
-        return await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+        return await wsApi.trade.order(instrument_id, type, 0, size, 1, true);
       }
     },
     async open(long, short) {
