@@ -15,7 +15,8 @@ export default {
     instruments: [],
     subscribed: new Set(),
     quotations: [],
-    positions: []
+    positions: [],
+    accounts: []
   },
   mutations: {
     async init(state) {
@@ -37,6 +38,7 @@ export default {
 
       wsApi.once('login', () => wsApi.trade.load());
       wsApi.trade.on('position', () => state.positions = wsApi.trade.positions);
+      wsApi.trade.on('account', () => state.accounts = wsApi.trade.accounts);
 
       state.instruments = await httpApi.futures.getInstruments();
 

@@ -1,17 +1,24 @@
 <template>
-  <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="$store.state.okex.tradePair" :single-select="false" show-select hide-default-footer>
-    <template v-slot:header.data-table-select />
-    <template v-slot:item.ask="{ item }">
-      <span :class="item.askClass">{{item.ask | price(digits)}}</span>
-    </template>
-    <template v-slot:item.bid="{ item }">
-      <span :class="item.bidClass">{{item.bid | price(digits)}}</span>
-    </template>
-    <template v-slot:item.delta="{ item }">
-      <span :class="item.deltaClass">{{item.delta | price(digits)}}</span>
-    </template>
-  </v-data-table>
-<!--  <div>{{positions}}</div>-->
+   <div>
+<!--    {{swapAccount}}<br/>-->
+<!--    {{futuresAccount}}<br/>-->
+    <v-row>
+      <v-col cols="12" sm="6">Swap Equity: {{swapAccount.equity | price(2)}} Liqui: {{swapAccount.liquiPrice | price(2)}}</v-col>
+      <v-col cols="12" sm="6">Futures Equity: {{futuresAccount.equity | price(2)}} Liqui: {{futuresAccount.liquiPrice | price(2)}}</v-col>
+    </v-row>
+    <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="$store.state.okex.tradePair" :single-select="false" show-select hide-default-footer>
+      <template v-slot:header.data-table-select />
+      <template v-slot:item.ask="{ item }">
+        <span :class="item.askClass">{{item.ask | price(digits)}}</span>
+      </template>
+      <template v-slot:item.bid="{ item }">
+        <span :class="item.bidClass">{{item.bid | price(digits)}}</span>
+      </template>
+      <template v-slot:item.delta="{ item }">
+        <span :class="item.deltaClass">{{item.delta | price(digits)}}</span>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script>
@@ -21,7 +28,7 @@ export default {
   name: 'Positions',
   props: ['coin', 'ins', 'digits'],
   filters: {
-    price(v, d) { return v && v.toFixed(d); }
+    price(v, d) { return v && (v * 1).toFixed(d); }
   },
   beforeMount() {
     this.$store.commit('okex/subscribe', this.coin);
@@ -76,6 +83,28 @@ export default {
   },
   computed: {
     ...mapState('okex', {
+      swapAccount(state) {
+        const acc = state.accounts.find(v => v.instrument_id && v.underlying.startsWith(this.coin) && v.currency === (this.ins === 'USDT' ? 'USDT' : this.coin));
+        if (acc) {
+          acc.liquiPrice = this.positions
+            .filter(p => p.instrument_id === `${this.coin}-${this.ins}-SWAP`)
+            .map(p => p.liquidation_price)
+            .reduce((m, v) => Math.max(m, v || 0), 0);
+        }
+
+        return acc || {};
+      },
+      futuresAccount(state) {
+        const acc = state.accounts.find(v => !v.instrument_id && v.underlying.startsWith(this.coin) && v.currency === (this.ins === 'USDT' ? 'USDT' : this.coin)) || {};
+        if (acc) {
+          acc.liquiPrice = this.positions
+            .filter(p => p.instrument_id.startsWith(`${this.coin}-${this.ins}-`) && !p.instrument_id.endsWith('SWAP'))
+            .map(p => p.liquidation_price)
+            .reduce((m, v) =>Math.max(m, v || 0), 0);
+        }
+
+        return acc || {};
+      },
       positions(state) {
         const prefix = `${this.coin}-${this.ins}-`;
         return state.quotations
