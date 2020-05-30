@@ -144,10 +144,11 @@ export default {
       const { instrument_id, ask, bid } = this.tradePair[idx];
       const price = (type === 1 || type === 4) ? ask * 1.005 : bid * 0.995;
 
+      const shouldWait = wsApi.trade.isSubscribed(instrument_id);
       try {
-        return await wsApi.trade.order(instrument_id, type, price, size, 0, true);
+        return await wsApi.trade.order(instrument_id, type, price, size, 0, shouldWait);
       } catch (e) {
-        return await wsApi.trade.order(instrument_id, type, 0, size, 1, true);
+        return await wsApi.trade.order(instrument_id, type, 0, size, 1, shouldWait);
       }
     },
     async open(long, short) {
