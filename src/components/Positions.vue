@@ -3,8 +3,23 @@
 <!--    {{swapAccount}}<br/>-->
 <!--    {{futuresAccount}}<br/>-->
     <v-row>
-      <v-col cols="12" sm="6">Swap Equity: {{swapAccount.equity | price(2)}} Liqui: {{swapAccount.liquiPrice | price(2)}}</v-col>
-      <v-col cols="12" sm="6">Futures Equity: {{futuresAccount.equity | price(2)}} Liqui: {{futuresAccount.liquiPrice | price(2)}}</v-col>
+      <v-col cols="12" sm="7"><v-text-field v-model="toTransfer" type="number"/></v-col>
+      <v-col cols="12" sm="6">
+        <v-row>
+          <v-col cols="12" sm="8">Swap Equity: {{swapAccount.equity | price(3)}} Liqui: {{swapAccount.liquiPrice | price(2)}}</v-col>
+          <v-col cols="12" sm="4">
+            <v-btn class="primary" @click="transferToFutures()">To Futures</v-btn>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-row>
+          <v-col cols="12" sm="8">Futures Equity: {{futuresAccount.equity | price(3)}} Liqui: {{futuresAccount.liquiPrice | price(2)}}</v-col>
+          <v-col cols="12" sm="4">
+            <v-btn class="primary" @click="transferToSwap()">To Swap</v-btn>
+          </v-col>
+        </v-row>
+      </v-col>
     </v-row>
     <v-data-table :headers="headers" :items="positions" item-key="name" :items-per-page="5" v-model="$store.state.okex.tradePair" :single-select="false" show-select hide-default-footer>
       <template v-slot:header.data-table-select />
@@ -23,6 +38,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { httpApi } from '../store/okex'
 
 export default {
   name: 'Positions',
@@ -39,8 +55,25 @@ export default {
       this.$store.commit('okex/subscribe', this.coin);
     }
   },
+  methods: {
+    async transferToFutures() {
+      const acc = this.ins === 'USDT' ? 'USDT' : this.coin;
+      const instrumentId = this.ins === 'USDT' ? `${this.coin}-USDT` : undefined;
+      if (window.confirm(`${acc} Transfer ${this.toTransfer} to Futures?`)) {
+        await httpApi.account.transfer(acc, this.toTransfer, 9, 3, instrumentId);
+      }
+    },
+    async transferToSwap() {
+      const acc = this.ins === 'USDT' ? 'USDT' : this.coin;
+      const instrumentId = this.ins === 'USDT' ? `${this.coin}-USDT` : undefined;
+      if (window.confirm(`${acc} Transfer ${this.toTransfer} to Swap?`)) {
+        await httpApi.account.transfer(acc, this.toTransfer, 3, 9, instrumentId);
+      }
+    }
+  },
   data() {
     return {
+      toTransfer: 0,
       headers: [
         {
           text: '',
