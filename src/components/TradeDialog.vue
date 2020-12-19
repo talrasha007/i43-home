@@ -1,5 +1,5 @@
 <template>
-  <v-dialog max-width="500px" @close="executing = false">
+  <v-dialog max-width="500px" @input="executing = false">
     <template v-slot:activator="{ on }">
       <v-btn :disabled="tradePair.length !== 2" class="primary" v-on="on">交易</v-btn>
     </template>
