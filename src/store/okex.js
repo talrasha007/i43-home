@@ -1,6 +1,6 @@
 import { HttpApi, WsApi } from 'okex-api';
 
-const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[null, null, null]'), { url: 'https://api.i43.io' });
+const httpApi = new HttpApi(...JSON.parse(localStorage.getItem('okex') || '[null, null, null]'), { baseURL: 'https://ph8xwdmyl4.execute-api.us-east-1.amazonaws.com/prod' });
 const wsApi = new WsApi(...JSON.parse(localStorage.getItem('okex') || '[null,null,null]'), { httpApi });
 wsApi.socket.setMaxListeners(32);
 
